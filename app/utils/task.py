@@ -15,7 +15,7 @@ def convert_file(file: ConvertedFiles):
 
     success_message = f'convert {file.upload_path} -> {file.convert_path} using filter : {get_filter(file)}'.strip()
     std = os.popen(
-        f'/usr/lib/libreoffice/program/soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
+        f'soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
     output = std.read().strip()
     if success_message.lower() == output.lower():
         file.status = Status.CONVERTED.name
