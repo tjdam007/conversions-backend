@@ -24,6 +24,7 @@ def convert_file(file: ConvertedFiles):
         file.status = Status.FAILED.name
         file.to_size = 0
 
+    print(file)
     success = conversionDao.update_file(file)
     if success:
         print("DB UPDATED", file)
