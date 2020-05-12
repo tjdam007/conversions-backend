@@ -120,7 +120,7 @@ def convert_attempt():
         return server_response(error=KEY_MISSING.format(FILE_ID)), 400
 
     file: ConvertedFiles = conversionDao.getFile(file_id, user_id)
-    if file in None or file.task_attempt >= 3:
+    if file is None or file.task_attempt >= 3:
         return server_response(error=CONVERSION_NOT_POSSIBLE), 400
 
     success = convert_file(file)
