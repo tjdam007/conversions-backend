@@ -28,7 +28,7 @@ class ProductionConfig(AppConfig):
 class DevelopmentConfig(AppConfig):
     DEBUG = True
     SECRET_KEY = b'\xe0\x9fj\xc5qxl\x19'
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/dev_conversion"
 

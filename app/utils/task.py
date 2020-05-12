@@ -16,15 +16,14 @@ def convert_file(file: ConvertedFiles):
     success_message = f'convert {file.upload_path} -> {file.convert_path} using filter : {get_filter(file)}'.strip()
     std = os.popen(
         f'soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
-    output = std.read().strip()
+    output = std.read().replace(f'Overwriting: {file.convert_path}', "")
+    output = output.strip()
     if success_message.lower() == output.lower():
         file.status = Status.CONVERTED.name
         file.to_size = os.stat(file.convert_path).st_size
     else:
         file.status = Status.FAILED.name
         file.to_size = 0
-
-    print(file)
     success = conversionDao.update_file(file)
     if success:
         print("DB UPDATED", file)
