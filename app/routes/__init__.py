@@ -49,9 +49,9 @@ def page_not_found(e):
 
 @app.errorhandler(403)
 def page_not_found(e):
-    return server_response(error=AUTHORIZE_ERROR), 404
+    return server_response(error=AUTHORIZE_ERROR), 403
 
 
 @app.errorhandler(500)
 def page_not_found(e):
-    return server_response(error=SERVER_INTERNAL_ERROR), 404
+    return server_response(error=SERVER_INTERNAL_ERROR), 500

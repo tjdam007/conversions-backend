@@ -11,7 +11,7 @@ from app.models.enums import SizeUnits
 from app.routes import authorize
 from app.utils import server_response, allowed_file, get_timestamp
 from app.utils.constants import CONTENT_TYPE_MULTIPART, METHOD_POST, FILE, USER_ID, \
-    UPLOAD_FOLDER, CONVERTED_FOLDER, CONTENT_TYPE, CONTENT_TYPE_JSON, FILE_ID
+    UPLOAD_FOLDER, CONVERTED_FOLDER, CONTENT_TYPE, CONTENT_TYPE_JSON, FILE_ID, ALLOWED_EXTENSIONS
 from app.utils.messages import CONTENT_TYPE_INVALID, KEY_MISSING, SOMETHING_WENT_WRONG, FILE_NOT_ALLOWED, \
     USER_NOT_EXISTS, FILE_NAME_EMPTY, FILE_UPLOADED_SUCCESS, FILE_CONVERT_SUCCESS, FILE_CONVERT_FAILED, \
     CONVERSION_NOT_POSSIBLE, INVALID_FILE_ID, FILE_NOT_FOUND, FILE_SIZE_TOO_LARGE
@@ -160,3 +160,9 @@ def get_all_files():
     except HTTPException as e:
         print(e)
         return server_response(error=SOMETHING_WENT_WRONG), 500
+
+
+@app.route('/conversion/allowed-file')
+def app_allowed_file():
+    ext_list = list(app.config[ALLOWED_EXTENSIONS])
+    return server_response(data=ext_list), 200

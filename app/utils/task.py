@@ -18,6 +18,7 @@ def convert_file(file: ConvertedFiles):
         f'soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
     output = std.read().replace(f'Overwriting: {file.convert_path}', "")
     output = output.strip()
+    print(f'Output: {output}')
     if success_message.lower() == output.lower():
         file.status = Status.CONVERTED.name
         file.to_size = os.stat(file.convert_path).st_size

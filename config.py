@@ -6,7 +6,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class AppConfig(object):
     DEBUG = False
     TESTING = False
-    MAX_CONTENT_LENGTH = 1 * 1024 * 1024
+    JSONIFY_PRETTYPRINT_REGULAR = False
+    MAX_CONTENT_LENGTH = 1 * 1024 * 1024  # 1 MBs
     UPLOAD_FOLDER = '{}/files/uploads'.format(os.path.abspath(os.curdir))
     CONVERTED_FOLDER = '{}/files/converted'.format(os.path.abspath(os.curdir))
     GOOGLE_CERTIFICATE_FILE_PATH = "{}/conversions-01-firebase-adminsdk-trny6-1dd4d3bcca.json".format(
@@ -26,6 +27,7 @@ class ProductionConfig(AppConfig):
 
 
 class DevelopmentConfig(AppConfig):
+    STATIC_FOLDER = '{}/files/'.format(os.path.abspath(os.curdir))
     DEBUG = True
     SECRET_KEY = b'\xe0\x9fj\xc5qxl\x19'
     SQLALCHEMY_ECHO = False

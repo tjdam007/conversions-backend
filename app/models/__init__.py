@@ -90,7 +90,8 @@ class ConvertedFiles(db.Model):
             'status': self.status,
             'to_size': self.to_size,
             'created_on': self.created_on,
-            'updated_on': self.updated_on
+            'updated_on': self.updated_on,
+            'task_attempt': self.task_attempt
         }
 
 
