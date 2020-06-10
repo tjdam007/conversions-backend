@@ -65,10 +65,28 @@ def update_attempt(file: ConvertedFiles):
 
 # get all user files
 def get_user_files(user_id):
-    files = ConvertedFiles.query.filter(ConvertedFiles.user_id == user_id) \
+    files = ConvertedFiles.query.filter(ConvertedFiles.user_id == user_id, ConvertedFiles.soft_delete == False) \
         .order_by(ConvertedFiles.updated_on.desc(), ConvertedFiles.id) \
         .all()
     file_dic = []
     for f in files:
         file_dic.append(f.toJSON())
     return file_dic
+
+
+# Delete a file
+def delete_file(file_id, user_id):
+    try:
+        f: ConvertedFiles = ConvertedFiles.query.filter(ConvertedFiles.id == file_id,
+                                                        ConvertedFiles.user_id == user_id).first()
+        if f is not None:
+            f.soft_delete = True
+            db.session.commit()
+            return True
+        return False
+    except IntegrityError as e:
+        print(e)
+        return False
+    except InvalidRequestError as e:
+        print(e)
+        return False

@@ -56,6 +56,7 @@ class ConvertedFiles(db.Model):
     task_attempt = db.Column(Integer, nullable=True)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+    soft_delete = db.Column(Integer, nullable=False, default=False)
     user_id = db.Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship(User)
 

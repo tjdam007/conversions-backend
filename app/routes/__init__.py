@@ -8,7 +8,8 @@ from ..models import userDao
 from ..utils import server_response
 from ..utils.constants import ENV, AUTHORIZATION, SECRET_KEY, DEVICE_ID, USER_ID
 # Root of Server
-from ..utils.messages import KEY_MISSING, USER_NOT_EXISTS, PATH_NOT_EXISTS, AUTHORIZE_ERROR, SERVER_INTERNAL_ERROR
+from ..utils.messages import KEY_MISSING, USER_NOT_EXISTS, PATH_NOT_EXISTS, AUTHORIZE_ERROR, SERVER_INTERNAL_ERROR, \
+    UPLOAD_FILE_LARGE_ERROR
 
 
 # Base request
@@ -50,6 +51,11 @@ def page_not_found(e):
 @app.errorhandler(403)
 def page_not_found(e):
     return server_response(error=AUTHORIZE_ERROR), 403
+
+
+@app.errorhandler(413)
+def page_not_found(e):
+    return server_response(error=UPLOAD_FILE_LARGE_ERROR), 413
 
 
 @app.errorhandler(500)

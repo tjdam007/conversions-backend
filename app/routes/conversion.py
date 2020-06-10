@@ -41,10 +41,10 @@ def upload():
             if file.filename == '':
                 return server_response(error=FILE_NAME_EMPTY), 400
             if not allowed_file(file.filename):
-                return server_response(error=FILE_NOT_ALLOWED)
+                return server_response(error=FILE_NOT_ALLOWED), 400
 
             if not userDao.is_user_exists(user_id):
-                return server_response(error=USER_NOT_EXISTS)
+                return server_response(error=USER_NOT_EXISTS), 400
 
             # to_ext = ".pdf"
             # if TO_EXT in request.form:
@@ -107,7 +107,7 @@ def upload():
 def convert_attempt():
     content_type = request.headers.get(CONTENT_TYPE)
     if content_type is None or content_type not in CONTENT_TYPE_JSON:
-        return server_response(error=CONTENT_TYPE_INVALID), 400
+        return server_response(error=CONTENT_TYPE_INVALID), 403
 
     user_id = request.environ.get(USER_ID)
     data = request.get_json()
@@ -140,13 +140,14 @@ def convert_attempt():
 @authorize
 def get_converted_file(file_id):
     if not isinstance(file_id, int):
-        return server_response(error=INVALID_FILE_ID), 200
+        return server_response(error=INVALID_FILE_ID), 403
     user_id = request.environ.get(USER_ID)
     file = conversionDao.getFile(file_id, user_id)
     if file is not None:
-        return send_file(file.convert_path, as_attachment=True, attachment_filename=f'{file.filename}{file.to_ext}')
+        return send_file(file.convert_path, as_attachment=True,
+                         attachment_filename=f'{file.filename}{file.to_ext}'), 200
     else:
-        return server_response(error=FILE_NOT_FOUND)
+        return server_response(error=FILE_NOT_FOUND), 403
 
 
 # Get all files for user
@@ -166,3 +167,17 @@ def get_all_files():
 def app_allowed_file():
     ext_list = list(app.config[ALLOWED_EXTENSIONS])
     return server_response(data=ext_list), 200
+
+
+# Delete a file
+@app.route('/conversion/delete/<int:file_id>', methods=['POST'])
+@authorize
+def soft_delete(file_id):
+    if not isinstance(file_id, int):
+        return server_response(error=INVALID_FILE_ID), 403
+    user_id = request.environ.get(USER_ID)
+    success = conversionDao.delete_file(file_id, user_id)
+    if success:
+        return server_response(message=FILE_CONVERT_SUCCESS), 200
+    else:
+        return server_response(error=FILE_NOT_FOUND), 403
