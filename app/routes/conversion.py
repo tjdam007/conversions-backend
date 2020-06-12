@@ -11,10 +11,10 @@ from app.models.enums import SizeUnits
 from app.routes import authorize
 from app.utils import server_response, allowed_file, get_timestamp
 from app.utils.constants import CONTENT_TYPE_MULTIPART, METHOD_POST, FILE, USER_ID, \
-    UPLOAD_FOLDER, CONVERTED_FOLDER, CONTENT_TYPE, CONTENT_TYPE_JSON, FILE_ID, ALLOWED_EXTENSIONS
+    UPLOAD_FOLDER, CONVERTED_FOLDER, FILE_ID, ALLOWED_EXTENSIONS
 from app.utils.messages import CONTENT_TYPE_INVALID, KEY_MISSING, SOMETHING_WENT_WRONG, FILE_NOT_ALLOWED, \
     USER_NOT_EXISTS, FILE_NAME_EMPTY, FILE_UPLOADED_SUCCESS, FILE_CONVERT_SUCCESS, FILE_CONVERT_FAILED, \
-    CONVERSION_NOT_POSSIBLE, INVALID_FILE_ID, FILE_NOT_FOUND, FILE_SIZE_TOO_LARGE
+    CONVERSION_NOT_POSSIBLE, INVALID_FILE_ID, FILE_NOT_FOUND, FILE_SIZE_TOO_LARGE, FILE_DELETE_SUCCESS
 from app.utils.task import convert_file
 
 app.app_context().push()
@@ -102,20 +102,13 @@ def upload():
 
 
 # Convert a user file on demand
-@app.route('/conversion/convert-attempt', methods=['POST'])
+@app.route('/conversion/convert-attempt/<int:file_id>', methods=['POST'])
 @authorize
-def convert_attempt():
-    content_type = request.headers.get(CONTENT_TYPE)
-    if content_type is None or content_type not in CONTENT_TYPE_JSON:
-        return server_response(error=CONTENT_TYPE_INVALID), 403
+def convert_attempt(file_id):
+    if not isinstance(file_id, int):
+        return server_response(error=INVALID_FILE_ID), 403
 
     user_id = request.environ.get(USER_ID)
-    data = request.get_json()
-    file_id = data.get(FILE_ID)
-
-    if user_id is None:
-        return server_response(error=KEY_MISSING.format(USER_ID)), 400
-
     if file_id is None:
         return server_response(error=KEY_MISSING.format(FILE_ID)), 400
 
@@ -178,6 +171,6 @@ def soft_delete(file_id):
     user_id = request.environ.get(USER_ID)
     success = conversionDao.delete_file(file_id, user_id)
     if success:
-        return server_response(message=FILE_CONVERT_SUCCESS), 200
+        return server_response(message=FILE_DELETE_SUCCESS), 200
     else:
         return server_response(error=FILE_NOT_FOUND), 403

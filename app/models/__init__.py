@@ -110,8 +110,8 @@ class UserToken(db.Model):
 
     def __repr__(self):
         return '<UserToken %r>' % f" id:{self.id}" \
-                                  f" token:{self.user_id}" \
-                                  f" user_id:{self.full_filename}"
+                                  f" token:{self.token}" \
+                                  f" user_id:{self.user_id}"
 
 
 # create all

@@ -11,13 +11,14 @@ from app.utils.push import file_convert_push
 
 
 # Create User
-def create_user(device_id):
+def create_user(device_id, fcm_token):
     try:
         # Generate JWT token
         user = User(device_id=device_id)
         db.session.add(user)
         db.session.commit()
         db.session.refresh(user)
+        create_fcm_token(user.id, fcm_token)
         user.auth_token = jwt.encode({DEVICE_ID: device_id, USER_ID: user.id}, app.config[SECRET_KEY])
         db.session.commit()
         db.session.refresh(user)
@@ -105,13 +106,12 @@ def create_fcm_token(user_id, token):
 # send file conversion push to user
 def send_convert_push(file: ConvertedFiles):
     try:
-        user_token: UserToken = UserToken.query.filter(UserToken.user_id).first()
+        user_token: UserToken = UserToken.query.filter(UserToken.user_id == file.user_id).first()
         if user_token is None:
             print('PUSH SEND FAILED')
         else:
             push_msg = file_convert_push(user_token.token, file.id, file.filename, file.from_ext, file.to_ext)
-
             response = messaging.send(push_msg)
             print(response)
-    except ValueError as e:
+    except Exception as e:
         print(e)

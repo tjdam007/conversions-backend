@@ -19,13 +19,16 @@ def create_user():
         return server_response(error=CONTENT_TYPE_INVALID), 400
     data = request.get_json()
     device_id = data.get(DEVICE_ID)
+    fcm_token = data.get(FCM_TOKEN)
     if device_id is None:
         return server_response(error=KEY_MISSING.format(DEVICE_ID)), 400
+    if fcm_token is None:
+        return server_response(error=KEY_MISSING.format(FCM_TOKEN)), 400
     try:
         # create user with device id
         if userDao.is_device_id_exists(device_id):
             return server_response(error=RECORD_EXIST), 409
-        success, user = userDao.create_user(device_id)
+        success, user = userDao.create_user(device_id, fcm_token)
         if success:
             return server_response(
                 data=user.toJSON(),
@@ -81,7 +84,7 @@ def fcm_token():
         return server_response(error=CONTENT_TYPE_INVALID), 400
     data = request.get_json()
     token = data.get(FCM_TOKEN)
-    if token is None :
+    if token is None:
         return server_response(error=KEY_MISSING.format(FCM_TOKEN)), 400
     user_id = request.environ.get(USER_ID)
     success = userDao.create_fcm_token(user_id, token)
