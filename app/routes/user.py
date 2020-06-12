@@ -7,7 +7,7 @@ from app.utils import server_response
 from app.utils.constants import DEVICE_ID, USER_NAME, EMAIL, PHOTO, CONTENT_TYPE, \
     CONTENT_TYPE_JSON, USER_ID, FCM_TOKEN
 from app.utils.messages import KEY_MISSING, CONTENT_TYPE_INVALID, USER_CREATE_SUCCESS, RECORD_EXIST, \
-    SOMETHING_WENT_WRONG, FCM_DEVICE_ADDED
+    SOMETHING_WENT_WRONG, FCM_DEVICE_ADDED, USER_RETURN
 from . import authorize
 
 
@@ -66,11 +66,17 @@ def update_user():
     if photo is None:
         return server_response(error=KEY_MISSING.format(PHOTO)), 400
     try:
-        message, user = userDao.update(user_id, user_name, email, photo)
-        if user is not None:
-            return server_response(data=user.toJSON(), message=message), 200
+        old_user = userDao.user_by_email(user_name, email, photo)
+        if old_user is None:
+            message, user = userDao.update(user_id, user_name, email, photo)
+            if user is not None:
+                return server_response(data=user.toJSON(), message=message), 200
+            else:
+                return server_response(error=message), 400
         else:
-            return server_response(error=message), 400
+            # map data to the old user
+            userDao.map_data(old_user.id, user_id)
+            return server_response(data=old_user.toJSON(), message=USER_RETURN.format(old_user.user_name)), 200
     except HTTPException as e:
         print(e)
         return server_response(error=SOMETHING_WENT_WRONG), 500

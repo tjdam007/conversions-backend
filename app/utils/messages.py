@@ -4,6 +4,7 @@ RECORD_EXIST = 'Duplicate record.'
 CONTENT_TYPE_INVALID = 'Invalid content type'
 USER_CREATE_SUCCESS = 'User created successfully'
 USER_UPDATE_SUCCESS = 'User updated successfully'
+USER_RETURN = "Welcome back {}"
 USER_NOT_EXISTS = 'User does not exists'
 AUTHORIZE_ERROR = 'Authorization failed : You are not allowed to make this request'
 UPLOAD_FILE_LARGE_ERROR = 'Upload failed : Maximum uploaded size is 1 MB'

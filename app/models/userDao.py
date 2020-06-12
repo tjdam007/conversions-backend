@@ -115,3 +115,37 @@ def send_convert_push(file: ConvertedFiles):
             print(response)
     except Exception as e:
         print(e)
+
+
+# Get user by email id
+def user_by_email(user_name, email, photo):
+    user = User.query.filter(User.email == email).first()
+    if user is not None:
+        user.photo = photo
+        user.user_name = user_name
+        db.session.commit()
+    return user
+
+
+def map_data(old_user_id, new_user_id):
+    # map new file with old user
+    db.session.query(ConvertedFiles) \
+        .filter(ConvertedFiles.user_id == new_user_id) \
+        .update({ConvertedFiles.user_id: old_user_id})
+
+    # map fcm token
+    newToken = db.session.query(UserToken) \
+        .filter(UserToken.user_id == new_user_id) \
+        .first()
+
+    oldToken: UserToken = db.session.query(UserToken) \
+        .filter(UserToken.user_id == old_user_id) \
+        .first()
+
+    # replace old token with new
+    oldToken.token = newToken.token
+    # remove new user token
+    newToken.token = "MAP TO OLD USER"
+
+    # Commit all changes
+    db.session.commit()
