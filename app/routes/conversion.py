@@ -91,7 +91,7 @@ def upload():
                 job: Job = app.queue.enqueue(convert_file, file_data)
                 # update task id
                 conversionDao.update_task_id(file_data.id, job.id)
-                return server_response(message=FILE_UPLOADED_SUCCESS), 200
+                return server_response(data=file_data.toJSON(), message=FILE_UPLOADED_SUCCESS), 200
             else:
                 return server_response(error=SOMETHING_WENT_WRONG), 500
         else:
@@ -119,9 +119,9 @@ def convert_attempt(file_id):
     if file.task_attempt == 3:
         return server_response(error=CONVERSION_NOT_POSSIBLE), 400
 
-    success = convert_file(file)
+    success, file_data = convert_file(file)
     if success:
-        return server_response(message=FILE_CONVERT_SUCCESS), 200
+        return server_response(data=file_data.toJSON(), message=FILE_CONVERT_SUCCESS), 200
     else:
         file.task_attempt += 1
         conversionDao.update_attempt(file)

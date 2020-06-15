@@ -13,13 +13,14 @@ def convert_file(file: ConvertedFiles):
     if not os.path.exists(file_convert_dir):
         os.makedirs(file_convert_dir)
 
-    success_message = f'convert {file.upload_path} -> {file.convert_path} using filter : {get_filter(file)}'.strip()
-    std = os.popen(
-        f'soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
-    output = std.read().replace(f'Overwriting: {file.convert_path}', "")
-    output = output.strip()
+    # success_message = f'convert {file.upload_path} -> {file.convert_path} using filter : {get_filter(file)}'.strip()
+    std = os.popen(f'soffice --convert-to pdf {file.upload_path} --outdir {file_convert_dir}')
+    output = std.read()
+    # replace(f'Overwriting: {file.convert_path}', "")
+    # output = output.strip()
     print(f'Output: {output}')
-    if success_message.lower() == output.lower():
+
+    if os.path.exists(file.convert_path):
         file.status = Status.CONVERTED.name
         file.to_size = os.stat(file.convert_path).st_size
     else:
@@ -31,7 +32,7 @@ def convert_file(file: ConvertedFiles):
         userDao.send_convert_push(file)
     else:
         print("FAILED TO UPDATE DB", file)
-    return success
+    return success, file
 
 
 # get export filters

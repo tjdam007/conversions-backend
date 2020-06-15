@@ -103,10 +103,29 @@ def create_fcm_token(user_id, token):
         return False
 
 
+# create fcm token for user
+def update_fcm_token(user_id, token):
+    try:
+        db.session.query(UserToken) \
+            .filter(UserToken.user_id == user_id) \
+            .update({UserToken.token: token})
+        db.session.commit()
+        return True
+    except IntegrityError as e:
+        print(e)
+        db.session.rollback()
+        return False
+    except DatabaseError as e:
+        print(e)
+        return False
+
+
 # send file conversion push to user
 def send_convert_push(file: ConvertedFiles):
     try:
-        user_token: UserToken = UserToken.query.filter(UserToken.user_id == file.user_id).first()
+        user_token: UserToken = UserToken.query.filter(UserToken.user_id == file.user_id) \
+            .order_by(UserToken.id.desc()) \
+            .first()
         if user_token is None:
             print('PUSH SEND FAILED')
         else:

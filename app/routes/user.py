@@ -93,7 +93,7 @@ def fcm_token():
     if token is None:
         return server_response(error=KEY_MISSING.format(FCM_TOKEN)), 400
     user_id = request.environ.get(USER_ID)
-    success = userDao.create_fcm_token(user_id, token)
+    success = userDao.update_fcm_token(user_id, token)
     if success:
         return server_response(message=FCM_DEVICE_ADDED), 200
     else:
