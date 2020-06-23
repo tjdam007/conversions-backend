@@ -7,7 +7,7 @@ class AppConfig(object):
     DEBUG = False
     TESTING = False
     JSONIFY_PRETTYPRINT_REGULAR = False
-    MAX_CONTENT_LENGTH = 1 * 1024 * 1024  # 1 MBs
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MBs
     UPLOAD_FOLDER = '{}/files/uploads'.format(os.path.abspath(os.curdir))
     CONVERTED_FOLDER = '{}/files/converted'.format(os.path.abspath(os.curdir))
     GOOGLE_CERTIFICATE_FILE_PATH = "{}/conversions-01-firebase-adminsdk-trny6-1dd4d3bcca.json".format(
