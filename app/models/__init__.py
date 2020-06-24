@@ -8,9 +8,10 @@ from app.models.enums import Status
 # User Table
 class User(db.Model):
     __tablename__ = "users"
-    id = db.Column(Integer, primary_key=True)
+    id = db.Column(Integer, primary_key=True,autoincrement=True)
+    device_id = db.Column(String(250), primary_key=True)
     user_name = db.Column(String(250), nullable=True)
-    device_id = db.Column(String(250), nullable=False, )
+    fcm_token = db.Column(String(250), nullable=True)
     email = db.Column(String(250), nullable=True, unique=True)
     auth_token = db.Column(String(250), nullable=True, unique=True)
     photo = db.Column(String(250), nullable=True)
@@ -29,12 +30,7 @@ class User(db.Model):
 
     def toJSON(self):
         return {
-            "id": self.id,
             "auth_token": self.auth_token,
-            "user_name": self.user_name,
-            "device_id": self.device_id,
-            "email": self.email,
-            "photo": self.photo,
         }
 
 
@@ -94,25 +90,6 @@ class ConvertedFiles(db.Model):
             'updated_on': self.updated_on,
             'task_attempt': self.task_attempt
         }
-
-
-# FCM Token Table
-class UserToken(db.Model):
-    __tablename__ = "tokens"
-    id = db.Column(Integer, primary_key=True)
-    token = db.Column(String(250), nullable=False)
-    user_id = db.Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship(User)
-
-    def __init__(self, user_id, token):
-        self.user_id = user_id
-        self.token = token
-
-    def __repr__(self):
-        return '<UserToken %r>' % f" id:{self.id}" \
-                                  f" token:{self.token}" \
-                                  f" user_id:{self.user_id}"
-
 
 # create all
 db.create_all()

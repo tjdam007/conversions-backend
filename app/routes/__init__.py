@@ -29,9 +29,9 @@ def authorize(function):
             payload = jwt.decode(authorization, app.config[SECRET_KEY])
             print(f'Auth :{payload}')
             device_id = payload.get(DEVICE_ID)
-            user_id = payload.get(USER_ID)
-            if userDao.is_user_exists(user_id):
-                request.environ[USER_ID] = user_id
+            user = userDao.get_user(device_id)
+            if user is not None:
+                request.environ[USER_ID] = user.id
                 request.environ[DEVICE_ID] = device_id
                 return function(*args, **kws)
             else:

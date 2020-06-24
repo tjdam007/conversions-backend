@@ -3,9 +3,8 @@ from firebase_admin import messaging
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, DatabaseError
 
 from app import db, app
-from app.models import User, UserToken, ConvertedFiles
-# create user
-from app.utils.constants import DEVICE_ID, SECRET_KEY, USER_ID
+from app.models import User, ConvertedFiles
+from app.utils.constants import DEVICE_ID, SECRET_KEY
 from app.utils.messages import USER_EMAIL_ID_EXISTS, USER_UPDATE_SUCCESS, USER_NOT_EXISTS
 from app.utils.push import file_convert_push
 
@@ -14,14 +13,13 @@ from app.utils.push import file_convert_push
 def create_user(device_id, fcm_token):
     try:
         # Generate JWT token
-        user = User(device_id=device_id)
+        auth_token = jwt.encode({DEVICE_ID: device_id}, app.config[SECRET_KEY])
+        user = User()
+        user.device_id = device_id
+        user.fcm_token = fcm_token
+        user.auth_token = auth_token
         db.session.add(user)
         db.session.commit()
-        db.session.refresh(user)
-        create_fcm_token(user.id, fcm_token)
-        user.auth_token = jwt.encode({DEVICE_ID: device_id, USER_ID: user.id}, app.config[SECRET_KEY])
-        db.session.commit()
-        db.session.refresh(user)
         return True, user
     except IntegrityError as e:
         print(e)
@@ -32,13 +30,9 @@ def create_user(device_id, fcm_token):
 
 
 # get user
-def get_user(user_id=None, device_id=None, ):
+def get_user(device_id=None):
     try:
-        if user_id and device_id is not None:
-            return db.session.query(User).filter(User.device_id == device_id, User.id == user_id).first()
-        elif user_id is not None:
-            return db.session.query(User).filter(User.id == user_id).first()
-        elif device_id is not None:
+        if device_id is not None:
             return db.session.query(User).filter(User.device_id == device_id).first()
         else:
             return None
@@ -88,27 +82,10 @@ def update(user_id, user_name, email, photo):
 
 
 # create fcm token for user
-def create_fcm_token(user_id, token):
-    try:
-        user_token = UserToken(user_id, token)
-        db.session.add(user_token)
-        db.session.commit()
-        return True
-    except IntegrityError as e:
-        print(e)
-        db.session.rollback()
-        return False
-    except DatabaseError as e:
-        print(e)
-        return False
-
-
-# create fcm token for user
 def update_fcm_token(user_id, token):
     try:
-        db.session.query(UserToken) \
-            .filter(UserToken.user_id == user_id) \
-            .update({UserToken.token: token})
+        user = db.session.query(User).filter(User.id == user_id).first()
+        user.fcm_token = token
         db.session.commit()
         return True
     except IntegrityError as e:
@@ -123,48 +100,14 @@ def update_fcm_token(user_id, token):
 # send file conversion push to user
 def send_convert_push(file: ConvertedFiles):
     try:
-        user_token: UserToken = UserToken.query.filter(UserToken.user_id == file.user_id) \
-            .order_by(UserToken.id.desc()) \
+        user: User = User.query.filter(User.id == file.user_id) \
+            .order_by(User.id.desc()) \
             .first()
-        if user_token is None:
+        if user is None:
             print('PUSH SEND FAILED')
         else:
-            push_msg = file_convert_push(user_token.token, file.id, file.filename, file.from_ext, file.to_ext)
+            push_msg = file_convert_push(user.fcm_token, file.id, file.filename, file.from_ext, file.to_ext)
             response = messaging.send(push_msg)
             print(response)
     except Exception as e:
         print(e)
-
-
-# Get user by email id
-def user_by_email(user_name, email, photo):
-    user = User.query.filter(User.email == email).first()
-    if user is not None:
-        user.photo = photo
-        user.user_name = user_name
-        db.session.commit()
-    return user
-
-
-def map_data(old_user_id, new_user_id):
-    # map new file with old user
-    db.session.query(ConvertedFiles) \
-        .filter(ConvertedFiles.user_id == new_user_id) \
-        .update({ConvertedFiles.user_id: old_user_id})
-
-    # map fcm token
-    newToken = db.session.query(UserToken) \
-        .filter(UserToken.user_id == new_user_id) \
-        .first()
-
-    oldToken: UserToken = db.session.query(UserToken) \
-        .filter(UserToken.user_id == old_user_id) \
-        .first()
-
-    # replace old token with new
-    oldToken.token = newToken.token
-    # remove new user token
-    newToken.token = "MAP TO OLD USER"
-
-    # Commit all changes
-    db.session.commit()

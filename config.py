@@ -6,6 +6,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class AppConfig(object):
     DEBUG = False
     TESTING = False
+    SECRET_KEY = b'\xe0\x9fj\xc5qxl\x19'
+    AUTH_SECRET = '70a2d8ea0eaccf9fc9f82f497b7b4807'
     JSONIFY_PRETTYPRINT_REGULAR = False
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MBs
     UPLOAD_FOLDER = '{}/files/uploads'.format(os.path.abspath(os.curdir))
@@ -23,21 +25,21 @@ class AppConfig(object):
 
 
 class ProductionConfig(AppConfig):
+    SECRET_KEY = '0e4c541b3342df5994682825d0785b2a'
+    AUTH_SECRET = '3814d1fe74d93cc1a82ffdf8653e1390'
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/prod_conversion"
 
 
 class DevelopmentConfig(AppConfig):
     STATIC_FOLDER = '{}/files/'.format(os.path.abspath(os.curdir))
     DEBUG = True
-    SECRET_KEY = b'\xe0\x9fj\xc5qxl\x19'
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/dev_conversion"
 
 
 class TestingConfig(AppConfig):
     TESTING = True
-    SECRET_KEY = "b'\xe0\x9fj\xc5qxl\x19'"
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/dev_conversion"

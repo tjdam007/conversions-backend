@@ -156,6 +156,7 @@ def get_all_files():
         return server_response(error=SOMETHING_WENT_WRONG), 500
 
 
+# Get allowed extension for conversion
 @app.route('/conversion/allowed-file')
 def app_allowed_file():
     ext_list = list(app.config[ALLOWED_EXTENSIONS])
