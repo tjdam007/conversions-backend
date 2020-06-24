@@ -8,11 +8,12 @@ from app.utils.constants import DEVICE_ID, CONTENT_TYPE, \
     CONTENT_TYPE_JSON, USER_ID, FCM_TOKEN
 from app.utils.messages import KEY_MISSING, CONTENT_TYPE_INVALID, USER_CREATE_SUCCESS, RECORD_EXIST, \
     SOMETHING_WENT_WRONG, FCM_DEVICE_ADDED
-from . import authorize
+from . import authorize, create_authorize
 
 
 # Create user
 @app.route("/user/create", methods=['POST'])
+@create_authorize
 def create_user():
     content_type = request.headers.get(CONTENT_TYPE)
     if content_type is None or content_type not in CONTENT_TYPE_JSON:
