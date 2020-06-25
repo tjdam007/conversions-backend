@@ -70,6 +70,7 @@ def create_authorize(function):
     @wraps(function)
     def wrapper(*args, **kws):
         client_id = request.headers.get(CLIENT_ID)
+        print(client_id)
         if client_id != app.config[CLIENT_ID_SECRET]:
             return server_response(error=KEY_MISSING.format(CLIENT_ID)), 403
 

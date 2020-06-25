@@ -8,12 +8,12 @@ from app.models.enums import Status
 # User Table
 class User(db.Model):
     __tablename__ = "users"
-    id = db.Column(Integer, primary_key=True,autoincrement=True)
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
     device_id = db.Column(String(250), primary_key=True)
+    auth_token = db.Column(String(250), nullable=False)
     user_name = db.Column(String(250), nullable=True)
     fcm_token = db.Column(String(250), nullable=True)
-    email = db.Column(String(250), nullable=True, unique=True)
-    auth_token = db.Column(String(250), nullable=True, unique=True)
+    email = db.Column(String(250), nullable=True)
     photo = db.Column(String(250), nullable=True)
 
     def __init__(self, user_name=None, auth_token=None, device_id=None, email=None, photo=None):
@@ -90,6 +90,7 @@ class ConvertedFiles(db.Model):
             'updated_on': self.updated_on,
             'task_attempt': self.task_attempt
         }
+
 
 # create all
 db.create_all()

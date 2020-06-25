@@ -32,6 +32,7 @@ class ProductionConfig(AppConfig):
 
 
 class DevelopmentConfig(AppConfig):
+    CLIENT_ID_SECRET = "862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com"
     DEBUG = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -39,6 +40,7 @@ class DevelopmentConfig(AppConfig):
 
 
 class TestingConfig(AppConfig):
+    CLIENT_ID_SECRET = "862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com"
     TESTING = True
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
