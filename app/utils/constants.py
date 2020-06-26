@@ -1,9 +1,13 @@
+# Headers
+AUTHORIZATION = "Authorization"
+APP_VERSION_CODE = "App-Version"
+APP_PACKAGE = "App-Package"
+CLIENT_ID = "Client-Id"
+
+# Config Keys
+LOGS_FILE = "LOGS_FILE"
 AUTH_SECRET = 'AUTH_SECRET'
 SECRET_KEY = 'SECRET_KEY'
-AUTHORIZATION = "Authorization"
-APP_VERSION_CODE = "app_version_code"
-APP_PACKAGE = "app_package"
-CLIENT_ID = "client_id"
 CLIENT_ID_SECRET = "CLIENT_ID_SECRET"
 APP_PACKAGE_SECRET = "APP_PACKAGE_SECRET"
 SQLALCHEMY_DATABASE_URI = 'SQLALCHEMY_DATABASE_URI'
@@ -29,6 +33,7 @@ DEVICE_ID = 'device_id'
 USER_NAME = 'user_name'
 EMAIL = 'email'
 PHOTO = 'photo'
+CREATED_ON = 'created_on'
 
 # conversion
 FILE = 'file'

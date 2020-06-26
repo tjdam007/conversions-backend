@@ -4,8 +4,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class AppConfig(object):
-    CLIENT_ID_SECRET = "862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com"
-    APP_PACKAGE_SECRET = "com.dev4solutions.conversions"
+    LOGS_FILE = '{}/logs/errorlogs.txt'.format(os.path.abspath(os.curdir))
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    CLIENT_ID_SECRET = '862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com'
+    APP_PACKAGE_SECRET = "com.dev4solutions.conversions.debug"
     DEBUG = False
     TESTING = False
     SECRET_KEY = b'\xe0\x9fj\xc5qxl\x19'
@@ -26,13 +29,13 @@ class AppConfig(object):
 
 
 class ProductionConfig(AppConfig):
+    APP_PACKAGE_SECRET = "com.dev4solutions.conversions"
     SECRET_KEY = '0e4c541b3342df5994682825d0785b2a'
     AUTH_SECRET = '3814d1fe74d93cc1a82ffdf8653e1390'
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/prod_conversion"
 
 
 class DevelopmentConfig(AppConfig):
-    CLIENT_ID_SECRET = "862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com"
     DEBUG = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -40,8 +43,7 @@ class DevelopmentConfig(AppConfig):
 
 
 class TestingConfig(AppConfig):
-    CLIENT_ID_SECRET = "862321218592-t53fg9aibdtc4leb1ueqrkgpp5njrpl7.apps.googleusercontent.com"
     TESTING = True
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://crud_conversion:Z/?^G~jW*ad`.6AY@localhost/dev_conversion"

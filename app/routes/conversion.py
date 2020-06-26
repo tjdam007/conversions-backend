@@ -108,11 +108,11 @@ def convert_attempt(file_id):
     if not isinstance(file_id, int):
         return server_response(error=INVALID_FILE_ID), 403
 
-    user_id = request.environ.get(USER_ID)
     if file_id is None:
         return server_response(error=KEY_MISSING.format(FILE_ID)), 400
 
-    file: ConvertedFiles = conversionDao.getFile(file_id, user_id)
+    file: ConvertedFiles = conversionDao.getFile(file_id)
+    app.logger.info(f'Converted File:{file.__repr__()}')
     if file is None:
         return server_response(error=CONVERSION_NOT_POSSIBLE), 400
 
@@ -134,8 +134,7 @@ def convert_attempt(file_id):
 def get_converted_file(file_id):
     if not isinstance(file_id, int):
         return server_response(error=INVALID_FILE_ID), 403
-    user_id = request.environ.get(USER_ID)
-    file = conversionDao.getFile(file_id, user_id)
+    file = conversionDao.getFile(file_id)
     if file is not None:
         return send_file(file.convert_path, as_attachment=True,
                          attachment_filename=f'{file.filename}{file.to_ext}'), 200
@@ -169,8 +168,7 @@ def app_allowed_file():
 def soft_delete(file_id):
     if not isinstance(file_id, int):
         return server_response(error=INVALID_FILE_ID), 403
-    user_id = request.environ.get(USER_ID)
-    success = conversionDao.delete_file(file_id, user_id)
+    success = conversionDao.delete_file(file_id)
     if success:
         return server_response(message=FILE_DELETE_SUCCESS), 200
     else:

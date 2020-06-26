@@ -1,3 +1,5 @@
+from logging import FileHandler, WARNING
+
 import firebase_admin
 from firebase_admin import credentials
 from flask import Flask
@@ -5,9 +7,17 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
 from .middleware import MiddleWare
-
 # Instance of flask app
+from .utils.constants import LOGS_FILE
+
 app = Flask(__name__)
+
+# Error Handle
+file_handler = FileHandler(app.config[LOGS_FILE])
+file_handler.setLevel(WARNING)
+
+# Add Error Handler to App
+app.logger.addHandler(file_handler)
 
 # load Environment configurations
 if app.config["ENV"] == "production":

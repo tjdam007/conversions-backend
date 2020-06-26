@@ -10,18 +10,17 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     device_id = db.Column(String(250), primary_key=True)
-    auth_token = db.Column(String(250), nullable=False)
+    auth_token = db.Column(String(250), nullable=True)
     user_name = db.Column(String(250), nullable=True)
     fcm_token = db.Column(String(250), nullable=True)
     email = db.Column(String(250), nullable=True)
     photo = db.Column(String(250), nullable=True)
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
-    def __init__(self, user_name=None, auth_token=None, device_id=None, email=None, photo=None):
+    def __init__(self, device_id=None, fcm_token=None):
         self.device_id = device_id
-        self.photo = photo
-        self.user_name = user_name
-        self.email = email
-        self.auth_token = auth_token
+        self.fcm_token = fcm_token
 
     def __repr__(self):
         return '<User %r>' % "name:{} id:{} device_id:{} email:{} photo:{}".format(self.user_name, self.id,

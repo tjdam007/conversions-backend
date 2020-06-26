@@ -13,16 +13,11 @@ from ..utils.messages import KEY_MISSING, USER_NOT_EXISTS, PATH_NOT_EXISTS, AUTH
     UPLOAD_FILE_LARGE_ERROR
 
 
-# Base request
-@app.route("/")
-def root():
-    return "{} Server is running".format(app.config.get(ENV)).capitalize()
-
-
 # authorize each request
 def authorize(function):
     @wraps(function)
     def wrapper(*args, **kws):
+        app.logger.info('%s %s', request.headers, request.get_data())
         authorization = request.headers.get(AUTHORIZATION)
         if authorization is None:
             return server_response(error=KEY_MISSING.format(AUTHORIZATION)), 403
@@ -46,15 +41,16 @@ def authorize(function):
 
         try:
             payload = jwt.decode(authorization, app.config[SECRET_KEY])
-            print(f'Auth :{payload}')
             device_id = payload.get(DEVICE_ID)
-            user = userDao.get_user(device_id)
+            user_id = payload.get(USER_ID)
+            user = userDao.get_user(user_id, device_id)
             if user is not None:
                 request.environ[USER_ID] = user.id
-                request.environ[DEVICE_ID] = device_id
+                request.environ[DEVICE_ID] = user.device_id
                 return function(*args, **kws)
             else:
                 return server_response(error=USER_NOT_EXISTS), 401
+
         except jwt.exceptions.DecodeError as e:
             print(e)
             return server_response(error=USER_NOT_EXISTS), 403
@@ -69,8 +65,8 @@ def authorize(function):
 def create_authorize(function):
     @wraps(function)
     def wrapper(*args, **kws):
+        app.logger.info('%s', request.headers)
         client_id = request.headers.get(CLIENT_ID)
-        print(client_id)
         if client_id != app.config[CLIENT_ID_SECRET]:
             return server_response(error=KEY_MISSING.format(CLIENT_ID)), 403
 
@@ -82,13 +78,18 @@ def create_authorize(function):
         if len(app_version_code) <= 0:
             return server_response(error=KEY_MISSING.format(APP_VERSION_CODE)), 403
         try:
-            ver = int(app_version_code)
-            print(ver)
+            version = int(app_version_code)
         except ValueError as e:
             return server_response(error=KEY_MISSING.format(APP_VERSION_CODE)), 403
         return function(*args, **kws)
 
     return wrapper
+
+
+# Base request
+@app.route("/")
+def root():
+    return "{} Server is running".format(app.config.get(ENV)).capitalize()
 
 
 @app.errorhandler(404)
