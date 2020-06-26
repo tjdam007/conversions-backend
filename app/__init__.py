@@ -7,17 +7,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
 from .middleware import MiddleWare
+
 # Instance of flask app
-from .utils.constants import LOGS_FILE
-
 app = Flask(__name__)
-
-# Error Handle
-file_handler = FileHandler(app.config[LOGS_FILE])
-file_handler.setLevel(WARNING)
-
-# Add Error Handler to App
-app.logger.addHandler(file_handler)
 
 # load Environment configurations
 if app.config["ENV"] == "production":
@@ -26,6 +18,17 @@ elif app.config["ENV"] == "testing":
     app.config.from_object(TestingConfig())
 else:
     app.config.from_object(DevelopmentConfig())
+
+from .utils.constants import LOGS_FILE
+
+# Error Handle
+file_handler = FileHandler(app.config[LOGS_FILE])
+file_handler.setLevel(WARNING)
+
+# Add Error Handler to App
+app.logger.addHandler(file_handler)
+
+# Middle Ware
 app.wsgi_app = MiddleWare(app.wsgi_app)
 
 db = SQLAlchemy(app)
