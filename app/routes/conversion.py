@@ -5,7 +5,7 @@ from rq.job import Job
 from werkzeug.exceptions import RequestEntityTooLarge, HTTPException
 from werkzeug.utils import secure_filename
 
-from app import app
+from app import app, cache
 from app.models import userDao, conversionDao, ConvertedFiles
 from app.models.enums import SizeUnits
 from app.routes import authorize
@@ -157,6 +157,7 @@ def get_all_files():
 
 # Get allowed extension for conversion
 @app.route('/conversion/allowed-file')
+@cache.cached(timeout=864000)
 def app_allowed_file():
     ext_list = list(app.config[ALLOWED_EXTENSIONS])
     return server_response(data=ext_list), 200
