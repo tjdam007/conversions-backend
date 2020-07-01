@@ -3,7 +3,6 @@ from logging import FileHandler, WARNING
 import firebase_admin
 from firebase_admin import credentials
 from flask import Flask
-from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
@@ -25,10 +24,6 @@ from .utils.constants import LOGS_FILE
 # Error Handle
 file_handler = FileHandler(app.config[LOGS_FILE])
 file_handler.setLevel(WARNING)
-
-# Cache
-cache = Cache(config={'CACHE_TYPE': 'simple'})
-cache.init_app(app)
 
 # Add Error Handler to App
 app.logger.addHandler(file_handler)
